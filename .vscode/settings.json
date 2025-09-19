@@ -1,0 +1,22 @@
+{
+    "files.associations": {
+        "array": "cpp",
+        "charconv": "cpp",
+        "compare": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "variant": "cpp",
+        "log.h": "c",
+        "global.h": "c",
+        "helper.h": "c",
+        "optional": "c",
+        "format": "c",
+        "system_error": "c",
+        "time.h": "c",
+        "cerrno": "c",
+        "dequeue.h": "c",
+        "iostream": "cpp"
+    }
+}
