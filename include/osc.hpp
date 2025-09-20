@@ -25,61 +25,6 @@ enum ENUM_SCREEN_FLAG_BITORDER{
 
 /// INIT & EXIT ///////////////////////////////////////////////////////////////////////////////////
 
-void sdlFontInit(){
-    __entry("font_init()");
-    if (TTF_Init() < 0) {
-        __err("[font_init] TTF_Init failed: %s\n", TTF_GetError());
-        return ;
-    }
-    font = TTF_OpenFont(FONT_PATH, FONT_SIZE);
-    if (!font) {
-        __err("[font_init] Error loading font: %s\n", TTF_GetError());
-        return ;
-    }
-    __exit("font_init()");
-}
-
-void sdlFontExit(){
-    __entry("simFontExit()");
-    if (font) {
-        TTF_CloseFont(font);
-        font = NULL;
-    }
-    TTF_Quit();
-    __exit("simFontExit()");
-}
-
-void sdlInit(){
-    __entry("screen_init()");
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("[screen_init] SDL_Init failed: %s\n", SDL_GetError());
-        return;
-    }
-    gWindow = SDL_CreateWindow(
-    WINDOW_NAME,
-        SDL_WINDOWPOS_CENTERED, 
-        SDL_WINDOWPOS_CENTERED,
-        screenW, screenH, 
-    SDL_WINDOW_SHOWN
-    );
-    gRenderer = SDL_CreateRenderer(
-        gWindow,
-        -1,
-        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
-    );
-    gTexture = SDL_CreateTexture(
-        gRenderer,
-        SDL_PIXELFORMAT_RGBA8888,
-        SDL_TEXTUREACCESS_TARGET,
-        screenW,
-        screenH
-    );
-    if (!gTexture) {
-        __log("Create gTexture failed: %s", SDL_GetError());
-        exit(1);
-    }
-    __exit("screen_init()");
-}
 
 /// OSC INIT & EXIT ///////////////////////////////////////////////////////////////////////////////
 
@@ -87,8 +32,18 @@ void oscInit(){
     __entry("oscInit()");
     statusFlag setFlag (STARTUP);
     screenBuffer = (color_t *) malloc(sizeof(color_t) * screenH * screenW);
-    sdlInit();
-    sdlFontInit();
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        __err("[oscInit] SDL_Init failed: %s\n", SDL_GetError());
+        return;
+    }
+    if (TTF_Init() < 0) {
+        __err("[oscInit] TTF_Init failed: %s\n", TTF_GetError());
+        return ;
+    }
+    createWindowContext(
+        &mainWindow, screenW, screenH, "ngxxfus' osc", 
+        FONT_PATH, FONT_SIZE
+    );
     screenFlag  setFlag (BUFFER_FLUSH);
     statusFlag setFlag (RUNNING);
     __exit("oscInit()");
@@ -96,11 +51,9 @@ void oscInit(){
 
 void oscExit(){
     __entry("oscInit()");
-    sdlFontExit();
-    SDL_DestroyTexture(gTexture);
-    SDL_DestroyRenderer(gRenderer);
-    SDL_DestroyWindow(gWindow);
+    destroyWindowContext(&mainWindow);
     SDL_Quit();
+    
     free(screenBuffer);
     __exit("oscInit()");
 }

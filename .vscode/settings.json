@@ -17,6 +17,7 @@
         "time.h": "c",
         "cerrno": "c",
         "dequeue.h": "c",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "stdarg.h": "c"
     }
 }

@@ -9,13 +9,15 @@ CFLAGS   := -Wall -g
 INCFLAGS := -Iinclude \
             -Ilib/log \
             -Ilib/dequeue \
+			-Ilib/windowContext
 
 LDFLAGS  := -lSDL2 -lSDL2_ttf -lpthread
 
 CPPSRC   := osc.cpp
 
 CSRC     := $(wildcard lib/log/*.c) \
-            $(wildcard lib/dequeue/*.c)
+            $(wildcard lib/dequeue/*.c) \
+            $(wildcard lib/windowContext/*.c)
 
 OBJ      := $(CPPSRC:.cpp=.o) $(CSRC:.c=.o)
 

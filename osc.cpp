@@ -5,10 +5,7 @@
 const xy_t       screenW = 640;
 const xy_t       screenH = 480;
 
-SDL_Window       *gWindow;                   /// Main application window
-SDL_Renderer     *gRenderer;                 /// Main SDL renderer used for drawing
-SDL_Texture      *gTexture;                  /// General-purpose texture (frame buffer or image)
-TTF_Font         *font;                      /// Global font resource
+windowContext_t* mainWindow;
 pthread_mutex_t  sdlMutex = PTHREAD_MUTEX_INITIALIZER;                   /// Mutex lock for SDL operations (thread-safety)
 pthread_mutex_t  scrBufMutex = PTHREAD_MUTEX_INITIALIZER;                /// Mutex (mutual exclusion) lock for screen buffer
 color_t *        screenBuffer;
@@ -39,16 +36,19 @@ int main(int argc, char** args) {
     __log("[main] Entry mainSloop");
     while (statusFlag hasFlag (RUNNING)) {
         if(screenFlag  hasFlag (BUFFER_FLUSH)){
-            // __sim_log("[eventProcessLoop] Has a render request!");
-            screenFlag  clrFlag (BUFFER_FLUSH);
-            __entryCriticalSection(&sdlMutex);
-            SDL_UpdateTexture(gTexture, NULL, screenBuffer, screenW * sizeof(color_t));
-            // Clear background với màu đen, alpha=255 (opaque)
-            SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-            SDL_RenderClear(gRenderer);
 
-            SDL_RenderCopy(gRenderer, gTexture, NULL, NULL);
-            SDL_RenderPresent(gRenderer);
+            screenFlag  clrFlag (BUFFER_FLUSH);
+
+            __entryCriticalSection(&sdlMutex);
+            
+            SDL_UpdateTexture(mainWindow->texture, NULL, screenBuffer, screenW * sizeof(color_t));
+            
+            SDL_SetRenderDrawColor(mainWindow->renderer, 0, 0, 0, 255);
+            SDL_RenderClear(mainWindow->renderer);
+
+            SDL_RenderCopy(mainWindow->renderer, mainWindow->texture, NULL, NULL);
+            SDL_RenderPresent(mainWindow->renderer);
+            
             __exitCriticalSection(&sdlMutex);
         }
         #if defined(RENDER_FPS)
